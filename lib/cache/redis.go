@@ -8,3 +8,4 @@ type RedisCache cache.RedisCache
 type RedisEndpointContext cache.RedisEndpointContext
 
 var New = cache.New
+var NewClient = cache.NewClient

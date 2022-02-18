@@ -9,4 +9,3 @@ The library implements middlewares(Decorator patterns) for authentication, autho
 
 ### Endpoint Middlewares 
 1.  RedisCacheMiddleware - This middleware will cache the response of the endpoint.
-1.  RedisCacheMiddleware - This middleware will cache the response of the endpoint.

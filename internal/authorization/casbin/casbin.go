@@ -1,7 +1,6 @@
 package casbin
 
 import (
-	"fmt"
 	pgadapter "github.com/casbin/casbin-pg-adapter"
 	"github.com/casbin/casbin/v2"
 	"github.com/go-kit/log"
@@ -33,16 +32,9 @@ func newCasbinService(adapter *pgadapter.Adapter, logger log.Logger) Service {
 	return svc
 }
 
-func InitCasbinAndGetEnforcer(logger log.Logger) *casbin.Enforcer {
+func InitCasbinAndGetEnforcer(dbSource interface{}, logger log.Logger) *casbin.Enforcer {
 	once.Do(func() {
 		_ = level.Info(logger).Log("msg", "Initializing the casbin postgres adapter")
-		dbSource := fmt.Sprintf("postgresql://%s:%s@%s:%s/%s?sslmode=%s",
-			os.Getenv("CASBIN_DB_USER"),
-			os.Getenv("CASBIN_DB_PASSWORD"),
-			os.Getenv("CASBIN_DB_HOST"),
-			os.Getenv("CASBIN_DB_PORT"),
-			os.Getenv("CASBIN_DB_NAME"),
-			os.Getenv("CASBIN_SSL_MODE"))
 		adaptor, err := pgadapter.NewAdapter(dbSource)
 		if err != nil {
 			os.Exit(1)

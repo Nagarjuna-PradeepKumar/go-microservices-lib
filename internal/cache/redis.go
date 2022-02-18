@@ -33,20 +33,9 @@ type cacheStruct struct {
 }
 
 func NewClient(ctx context.Context,
-	host string,
-	port string,
-	password string,
-	DB int,
+	options *redis.Options,
 	logger log.Logger) *redis.Client {
-	client := redis.NewClient(&redis.Options{
-		//TLSConfig: &tls.Config{
-		//	MinVersion: tls.VersionTLS12,
-		//	Certificates: []tls.Certificate{cert}
-		//},
-		Addr:     host + ":" + port,
-		Password: password,
-		DB:       DB,
-	})
+	client := redis.NewClient(options)
 
 	_, err := client.Ping(ctx).Result()
 	if err != nil {

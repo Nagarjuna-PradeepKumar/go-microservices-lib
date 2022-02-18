@@ -1,7 +1,0 @@
-package http
-
-import "github.com/beezlabs-org/go-microservices-lib/internal/transport/http"
-
-var GenericMiddlewareToSetHTTPHeader = http.GenericMiddlewareToSetHTTPHeader
-var GenericMiddlewareToUpdateEndpointContextForCacheProcessing = http.GenericMiddlewareToUpdateEndpointContextForCacheProcessing
-var JwtMiddlewareForMicrosoftIdentity = http.JwtMiddlewareForMicrosoftIdentity

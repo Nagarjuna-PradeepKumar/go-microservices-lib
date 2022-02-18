@@ -2,25 +2,12 @@ package endpoints
 
 import (
 	"context"
-	"fmt"
 	redis "github.com/beezlabs-org/go-microservices-lib/internal/cache"
 	"github.com/go-kit/kit/endpoint"
-	"github.com/go-kit/kit/metrics"
 	"github.com/go-kit/log"
 	"github.com/go-kit/log/level"
 	"time"
 )
-
-func InstrumentationMiddleware(duration metrics.Histogram) endpoint.Middleware {
-	return func(next endpoint.Endpoint) endpoint.Endpoint {
-		return func(ctx context.Context, request interface{}) (response interface{}, err error) {
-			defer func(begin time.Time) {
-				duration.With("success", fmt.Sprint(err == nil)).Observe(time.Since(begin).Seconds())
-			}(time.Now())
-			return next(ctx, request)
-		}
-	}
-}
 
 func RedisCacheMiddleware(redis redis.RedisCache, endpointName string, logger log.Logger) endpoint.Middleware {
 	return func(next endpoint.Endpoint) endpoint.Endpoint {

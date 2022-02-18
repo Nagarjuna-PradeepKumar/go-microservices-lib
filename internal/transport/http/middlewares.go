@@ -13,14 +13,7 @@ import (
 	"strings"
 )
 
-func GenericMiddlewareToSetHTTPHeader(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		next.ServeHTTP(w, r)
-	})
-}
-
-func GenericMiddlewareToUpdateEndpointContextForCacheProcessing(next http.Handler) http.Handler {
+func GenericMiddlewareToUpdateEndpointContextForCache(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var endpointContext cache.RedisEndpointContext
 		endpointContext.NotFromCache = r.Header.Get("X-No-Cache") == "true"

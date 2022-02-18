@@ -11,6 +11,7 @@ import (
 	"github.com/go-kit/kit/metrics/prometheus"
 	"github.com/go-kit/log"
 	"github.com/go-kit/log/level"
+	"github.com/go-redis/redis/v8"
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
 	"net/http"
 	"os"

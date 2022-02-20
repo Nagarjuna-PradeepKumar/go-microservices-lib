@@ -56,6 +56,7 @@ func getResponseFromDomainAndCacheIt(ctx context.Context, request interface{}, n
 	//Store the response in the cache
 	if err == nil {
 		//Save the response in the cache as a separate go routine to avoid blocking the main thread
+		//The save attempt has to succeed within 5 Sec else the context will expire cancelling the attempt
 		ctxSaveCache, _ := context.WithTimeout(context.Background(), 5*time.Second)
 		go saveResponseToCache(ctxSaveCache, key, ttl, returnedResponse, redis, logger)
 	}

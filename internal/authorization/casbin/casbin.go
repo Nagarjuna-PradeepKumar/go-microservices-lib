@@ -16,6 +16,7 @@ type casbinService struct {
 	defaultEnforcer *casbin.Enforcer
 	adapter         *pgadapter.Adapter
 	logger          log.Logger
+	confPath        string
 }
 
 type Service interface {
@@ -24,22 +25,23 @@ type Service interface {
 	GetNewFilteredEnforcer(filter interface{}) *casbin.Enforcer
 }
 
-func newCasbinService(adapter *pgadapter.Adapter, logger log.Logger) Service {
+func newCasbinService(adapter *pgadapter.Adapter, logger log.Logger, confPath string) Service {
 	svc = &casbinService{
-		adapter: adapter,
-		logger:  logger,
+		adapter:  adapter,
+		logger:   logger,
+		confPath: confPath,
 	}
 	return svc
 }
 
-func InitCasbinAndGetEnforcer(dbSource interface{}, logger log.Logger) *casbin.Enforcer {
+func InitCasbinAndGetEnforcer(dbSource interface{}, logger log.Logger, confPath string) *casbin.Enforcer {
 	once.Do(func() {
 		_ = level.Info(logger).Log("msg", "Initializing the casbin postgres adapter")
 		adaptor, err := pgadapter.NewAdapter(dbSource)
 		if err != nil {
 			os.Exit(1)
 		}
-		newCasbinService(adaptor, logger)
+		newCasbinService(adaptor, logger, confPath)
 	})
 	svc := GetService()
 	setDefaultEnforcer(svc.GetNewEnforcer())
@@ -80,7 +82,7 @@ func (c casbinService) GetNewFilteredEnforcer(filter interface{}) *casbin.Enforc
 
 func getEnforcer(c casbinService) *casbin.Enforcer {
 	_ = level.Info(c.logger).Log("msg", "Initializing the casbin enforcer")
-	enforcer, err := casbin.NewEnforcer("common/authorization/casbin/casbin_model.conf", c.adapter)
+	enforcer, err := casbin.NewEnforcer(c.confPath, c.adapter)
 	if err != nil {
 		os.Exit(1)
 	}

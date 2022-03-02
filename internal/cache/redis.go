@@ -3,6 +3,7 @@ package cache
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"github.com/go-kit/log"
 	"github.com/go-kit/log/level"
 	"github.com/go-redis/redis/v8"
@@ -16,7 +17,7 @@ type RedisCache interface {
 	Set(ctx context.Context, key string, value interface{}, ttl time.Duration) error
 	SetCacheForEndpoint(ctx context.Context, name string, ttl time.Duration)
 	CheckIfEndPointIsCacheableAndGetTTL(ctx context.Context, endpointName string) (bool, time.Duration, error)
-	GetEndpointContext(ctx context.Context) RedisEndpointContext
+	GetEndpointContext(ctx context.Context) (RedisEndpointContext, error)
 	CacheEndpointResponse(ctx context.Context, key string, ttl time.Duration,
 		response interface{}) error
 }
@@ -150,10 +151,14 @@ func convertStringToTimeDuration(data string) (time.Duration, error) {
 	return ttl, nil
 }
 
-func (r cacheStruct) GetEndpointContext(ctx context.Context) RedisEndpointContext {
+func (r cacheStruct) GetEndpointContext(ctx context.Context) (RedisEndpointContext, error) {
 	_ = level.Info(r.logger).Log("function", "GetEndpointContext")
-	endpointContext := ctx.Value("cacheable-endpoint-context").(RedisEndpointContext)
-	return endpointContext
+	d := ctx.Value("cacheable-endpoint-context")
+	if d == nil {
+		return RedisEndpointContext{}, errors.New("no cacheable-endpoint-context found")
+	}
+	endpointContext := d.(RedisEndpointContext)
+	return endpointContext, nil
 }
 
 func (r cacheStruct) CacheEndpointResponse(ctx context.Context, key string, ttl time.Duration, response interface{}) error {

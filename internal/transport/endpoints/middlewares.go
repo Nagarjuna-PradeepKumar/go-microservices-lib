@@ -17,8 +17,8 @@ func RedisCacheMiddleware(redis redis.RedisCache, endpointName string, logger lo
 				_ = level.Info(logger).Log("function", "RedisCacheMiddleware", "err", err)
 			} else {
 				if isCacheable {
-					endpointContext := redis.GetEndpointContext(ctx)
-					if endpointContext.Cacheable {
+					endpointContext, err := redis.GetEndpointContext(ctx)
+					if err != nil && endpointContext.Cacheable {
 						key := endpointName + ":" + endpointContext.Key
 						//Check if the cache has the required data
 						if !endpointContext.NotFromCache {

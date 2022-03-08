@@ -17,7 +17,7 @@ func GenericMiddlewareToUpdateEndpointContextForCache(next http.Handler) http.Ha
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var endpointContext cache.RedisEndpointContext
 		endpointContext.NotFromCache = r.Header.Get("X-No-Cache") == "true"
-		endpointContext.Key = r.URL.Path
+		endpointContext.Key = r.URL.Path + "?" + r.URL.RawQuery
 		endpointContext.Cacheable = r.Method == http.MethodGet
 		ctx := context.WithValue(r.Context(), "cacheable-endpoint-context", endpointContext)
 		next.ServeHTTP(w, r.WithContext(ctx))

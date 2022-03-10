@@ -1,12 +1,13 @@
 package casbin
 
 import (
+	"os"
+	"sync"
+
 	pgadapter "github.com/casbin/casbin-pg-adapter"
 	"github.com/casbin/casbin/v2"
 	"github.com/go-kit/log"
 	"github.com/go-kit/log/level"
-	"os"
-	"sync"
 )
 
 var once sync.Once
@@ -39,6 +40,7 @@ func InitCasbinAndGetEnforcer(dbSource interface{}, logger log.Logger, confPath 
 		_ = level.Info(logger).Log("msg", "Initializing the casbin postgres adapter")
 		adaptor, err := pgadapter.NewAdapter(dbSource)
 		if err != nil {
+			_ = level.Error(logger).Log("exit", err)
 			os.Exit(1)
 		}
 		newCasbinService(adaptor, logger, confPath)
@@ -65,6 +67,7 @@ func (c casbinService) GetNewEnforcer() *casbin.Enforcer {
 	_ = level.Info(c.logger).Log("msg", "Loading policy from database")
 	err := enforcer.LoadPolicy()
 	if err != nil {
+		_ = level.Error(c.logger).Log("exit", err)
 		os.Exit(1)
 	}
 	return enforcer
@@ -75,6 +78,7 @@ func (c casbinService) GetNewFilteredEnforcer(filter interface{}) *casbin.Enforc
 	_ = level.Info(c.logger).Log("msg", "Loading policy from database")
 	err := enforcer.LoadFilteredPolicy(filter)
 	if err != nil {
+		_ = level.Error(c.logger).Log("exit", err)
 		os.Exit(1)
 	}
 	return enforcer
@@ -84,6 +88,7 @@ func getEnforcer(c casbinService) *casbin.Enforcer {
 	_ = level.Info(c.logger).Log("msg", "Initializing the casbin enforcer")
 	enforcer, err := casbin.NewEnforcer(c.confPath, c.adapter)
 	if err != nil {
+		_ = level.Error(c.logger).Log("exit", err)
 		os.Exit(1)
 	}
 	return enforcer
